@@ -449,25 +449,27 @@ def TestFunction1(point):
 	if( (x<0.2) or (y<0.2) or (z<0.2)):
 		return 0
 	#upper bound
-	elif ((x>1.9) or (y>1.9) or (z>1.9)):
+	elif ((x>(max_size-0.2)) or (y>(max_size-0.2)) or (z>(max_size-0.2))):
 		return 0
-	elif (math.sin(x*y) < 0.7):
+	elif (math.sin(((x/3)*(y/4))+z/4) < 0.7):
 		return 1
 	else: 
 		return 0
-start_time = time.time()
-mySTL = SimpleSTL('test1')
-origin = [0,0,0]
-step_size = 0.05
-for x in np.arange(0,2,step_size):
-	for y in np.arange(0,2,step_size):
-		for z in np.arange(0,2,step_size):
-			origin = [x, y, z]
-			testCube = Cube(origin, step_size, TestFunction1)
+if(__name__ == "__main__"):
+	start_time = time.time()
+	mySTL = SimpleSTL('test1')
+	origin = [0,0,0]
+	step_size = 0.1
+	max_size = 10
+	for x in np.arange(0,max_size,step_size):
+		for y in np.arange(0,max_size,step_size):
+			for z in np.arange(0,max_size,step_size):
+				origin = [x, y, z]
+				testCube = Cube(origin, step_size, TestFunction1)
 
-			triangles = MarchingCubes(testCube)
-			if triangles is not None:
-				for triangle in triangles:
-					mySTL.addFacet(triangle)
-mySTL.ExportSTL()
-print("--- %s seconds ---" % (time.time() - start_time))
+				triangles = MarchingCubes(testCube)
+				if triangles is not None:
+					for triangle in triangles:
+						mySTL.addFacet(triangle)
+	mySTL.ExportSTL()
+	print("--- %s seconds ---" % (time.time() - start_time))
