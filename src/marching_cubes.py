@@ -1,17 +1,14 @@
-from simple_stl import SimpleSTL
 import math
 import numpy as np
-import time
-
 #marching cubes
 
-
+#helper classes
 class Cube:
 	stepSize = 0
 	function = None
-	points = [[0,0,0]]*8
-	values = [0]*8
-	origin = [0,0,0]
+	points = [[0.0,0.0,0.0]]*8
+	values = [0.0]*8
+	origin = [0.0,0.0,0.0]
 	def __init__(self, origin, stepSize, function):
 		self.stepSize = stepSize
 		self.origin = origin
@@ -419,7 +416,8 @@ def MarchingCubes(polyCube):
 	triangles= []
 
 	while(triTable[cube_index][i] != -1):
-		new_triangle = Facet([vert_list[triTable[cube_index][i]], 
+		new_triangle = Facet(
+							[vert_list[triTable[cube_index][i]], 
 							vert_list[triTable[cube_index][i+1]],
 							vert_list[triTable[cube_index][i+2]]])
 
@@ -429,47 +427,9 @@ def MarchingCubes(polyCube):
 	return triangles
 
 def PointInterp(p1, p2):
-	x = (p1[0]+p2[0])/2
-	y = (p1[1]+p2[1])/2
-	z = (p1[2]+p2[2])/2
+	x = round((p1[0]+p2[0])/2.0, 8)
+	y = round((p1[1]+p2[1])/2.0, 8)
+	z = round((p1[2]+p2[2])/2.0, 8)
 	return[x,y,z]
 
-def TestFunction( point ):
-	[x,y,z] = point
-	val = x*x+y*y+z*z
-	if( (x<0.2) or (y<0.2) or (z<0.2)):
-		return 0
-	if val < 3:
-		return 1
-	else:
-		return 0
-def TestFunction1(point):
-	[x,y,z] = point
-	#lower bound
-	if( (x<0.2) or (y<0.2) or (z<0.2)):
-		return 0
-	#upper bound
-	elif ((x>(max_size-0.2)) or (y>(max_size-0.2)) or (z>(max_size-0.2))):
-		return 0
-	elif (math.sin(((x/3)*(y/4))+z/4) < 0.7):
-		return 1
-	else: 
-		return 0
-if(__name__ == "__main__"):
-	start_time = time.time()
-	mySTL = SimpleSTL('test1')
-	origin = [0,0,0]
-	step_size = 0.1
-	max_size = 10
-	for x in np.arange(0,max_size,step_size):
-		for y in np.arange(0,max_size,step_size):
-			for z in np.arange(0,max_size,step_size):
-				origin = [x, y, z]
-				testCube = Cube(origin, step_size, TestFunction1)
 
-				triangles = MarchingCubes(testCube)
-				if triangles is not None:
-					for triangle in triangles:
-						mySTL.addFacet(triangle)
-	mySTL.ExportSTL()
-	print("--- %s seconds ---" % (time.time() - start_time))

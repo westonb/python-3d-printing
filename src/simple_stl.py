@@ -27,4 +27,12 @@ class SimpleSTL:
 	def addFacet(self, facet):
 		self.facetList.append(facet)
 
+	def exportBinSTL(self):
+		#80 byte header
+
+		#4 byte long int (number of facets)
+
+		#normal and 3 edges. each as three 4 byte floats, 2 byte empty spacer (50 bytes each facet)
+		pass
+
 
