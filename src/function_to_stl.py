@@ -41,7 +41,8 @@ def FunctionToSTL(function, stepSize, Min, Max, fileName):
 		for triangleMesh in subResult:
 			mySTL.addFacet(triangleMesh)
 
-	mySTL.ExportSTL()
+	#mySTL.ExportBinSTL()
+	mySTL.ExportBinSTL()
 
 
 
