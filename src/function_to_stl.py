@@ -1,5 +1,4 @@
-from marching_cubes import Cube
-from marching_cubes import MarchingCubes
+import marching_cubes as mc
 from simple_stl import SimpleSTL
 import multiprocessing as mp 
 import numpy as np
@@ -13,16 +12,19 @@ def MeshSection(arg):
 	[function, xmin, xmax, ymin, ymax, zmin, zmax, step_size] = arg
 
 	meshes = []
-	for x in np.arange(xmin,xmax,step_size):
-		for y in np.arange(ymin,ymax,step_size):
-			for z in np.arange(zmin,zmax,step_size):
-				origin = [x, y, z]
-				testCube = Cube(origin, step_size, function)
-				new_meshes = MarchingCubes(testCube)
+	generator = mc.CubeGrid(function,[xmax-xmin,ymax-ymin,zmax-zmin], [xmin, ymin, zmin], step_size)
 
-				if(new_meshes is not None):
-					for new in new_meshes:
-						meshes.append(new)
+	nextCube = generator.SpawnSequentialCube()
+
+	while nextCube is not None:
+		newMeshes = mc.MarchingCubes(nextCube[0], nextCube[1])
+		
+		nextCube = generator.SpawnSequentialCube()
+		if(newMeshes is not None):
+			
+			for new in newMeshes:
+				meshes.append(new)
+				
 	return meshes
 
 
@@ -48,5 +50,5 @@ def FunctionToSTL(function, stepSize, Min, Max, fileName):
 
 if __name__ == '__main__':
 	start_time = time.time()
-	FunctionToSTL(fn.sine_grid, 0.05, 0., 10., "test2")
+	FunctionToSTL(fn.sine_grid, 0.05, 0, 200, "test2")
 	print("--- %s seconds ---" % (time.time() - start_time))

@@ -1,5 +1,8 @@
 import math
 import numpy as np
+import time
+import simple_stl as stl
+import functions_3d as fn
 #marching cubes
 
 #helper classes
@@ -30,7 +33,129 @@ class Cube:
 		self.values[5] = self.function(self.points[5])
 		self.values[6] = self.function(self.points[6])
 		self.values[7] = self.function(self.points[7])
+class CubeGrid:
+	Size = [0,0,0]
+	Origin = [0,0,0]
+	StepSize = 0.
+	SequentalCount = [0,0,0]
+	Function = None
+
+	def __init__(self, Function, Size, Origin, StepSize):
+		self.Size = Size
+		self.Origin = Origin
+		self.StepSize = StepSize
+		self.SequentalCount = [0,0,0]
+		self.Function = Function
+		self.Solutions = np.full((Size[0]+1, Size[1]+1, Size[2]+1), -1, int)
+	#(points, values)
+	def SpawnSequentialCube(self):
+		points = [[0,0,0]]*8
+		values = [0]*8
+		
+
+		points[0] = [(self.SequentalCount[0]+self.Origin[0])*self.StepSize, 
+					(self.SequentalCount[1]+self.Origin[1])*self.StepSize,
+					(self.SequentalCount[2]+self.Origin[2])*self.StepSize]
+		points[1] = [(self.SequentalCount[0]+self.Origin[0]+1)*self.StepSize, 
+					(self.SequentalCount[1]+self.Origin[1])*self.StepSize,
+					(self.SequentalCount[2]+self.Origin[2])*self.StepSize]
+		points[2] = [(self.SequentalCount[0]+self.Origin[0]+1)*self.StepSize, 
+					(self.SequentalCount[1]+self.Origin[1]+1)*self.StepSize,
+					(self.SequentalCount[2]+self.Origin[2])*self.StepSize]
+		points[3] = [(self.SequentalCount[0]+self.Origin[0])*self.StepSize, 
+					(self.SequentalCount[1]+self.Origin[1]+1)*self.StepSize,
+					(self.SequentalCount[2]+self.Origin[2])*self.StepSize]
+		points[4] = [(self.SequentalCount[0]+self.Origin[0])*self.StepSize, 
+					(self.SequentalCount[1]+self.Origin[1])*self.StepSize,
+					(self.SequentalCount[2]+self.Origin[2]+1)*self.StepSize]
+		points[5] = [(self.SequentalCount[0]+self.Origin[0]+1)*self.StepSize, 
+					(self.SequentalCount[1]+self.Origin[1])*self.StepSize,
+					(self.SequentalCount[2]+self.Origin[2]+1)*self.StepSize]
+		points[6] = [(self.SequentalCount[0]+self.Origin[0]+1)*self.StepSize, 
+					(self.SequentalCount[1]+self.Origin[1]+1)*self.StepSize,
+					(self.SequentalCount[2]+self.Origin[2]+1)*self.StepSize]
+		points[7] = [(self.SequentalCount[0]+self.Origin[0])*self.StepSize, 
+					(self.SequentalCount[1]+self.Origin[1]+1)*self.StepSize,
+					(self.SequentalCount[2]+self.Origin[2]+1)*self.StepSize]
+		#memoize solutions 
+		#point 0
+		if (self.Solutions[self.SequentalCount[0]][self.SequentalCount[1]][self.SequentalCount[2]]) != -1:
+			values[0] = (self.Solutions[self.SequentalCount[0]] [self.SequentalCount[1]][self.SequentalCount[2]])
+			
+		else:
+			values[0] = self.Function(points[0])
+			
+			(self.Solutions[self.SequentalCount[0]][self.SequentalCount[1]][self.SequentalCount[2]]) = values[0]
+		#point 1
+
+		if (self.Solutions[self.SequentalCount[0]+1][self.SequentalCount[1]][self.SequentalCount[2]]) != -1:
+			values[1] = (self.Solutions[self.SequentalCount[0]+1] [self.SequentalCount[1]][self.SequentalCount[2]])
+		else:
+			values[1] = self.Function(points[1])
+			(self.Solutions[self.SequentalCount[0]+1][self.SequentalCount[1]][self.SequentalCount[2]]) = values[1]
+		#point 2
+		if (self.Solutions[self.SequentalCount[0]+1][self.SequentalCount[1]+1][self.SequentalCount[2]]) != -1:
+			values[2] = (self.Solutions[self.SequentalCount[0]+1][self.SequentalCount[1]+1][self.SequentalCount[2]])
+		else:
+			values[2] = self.Function(points[2])
+			(self.Solutions[self.SequentalCount[0]+1][self.SequentalCount[1]+1][self.SequentalCount[2]]) = values[2]
+		#point 3
+		if (self.Solutions[self.SequentalCount[0]][self.SequentalCount[1]+1][self.SequentalCount[2]]) != -1:
+			values[3] = (self.Solutions[self.SequentalCount[0]] [self.SequentalCount[1]+1][self.SequentalCount[2]])
+		else:
+			values[3] = self.Function(points[2])
+			(self.Solutions[self.SequentalCount[0]][self.SequentalCount[1]+1][self.SequentalCount[2]]) = values[3]
+		#point 4
+		if (self.Solutions[self.SequentalCount[0]][self.SequentalCount[1]][self.SequentalCount[2]+1]) != -1:
+			values[4] = (self.Solutions[self.SequentalCount[0]][self.SequentalCount[1]][self.SequentalCount[2]+1])
+		else:
+			values[4] = self.Function(points[0])
+			(self.Solutions[self.SequentalCount[0]][self.SequentalCount[1]][self.SequentalCount[2]+1]) = values[4]
+		#point 5
+		if (self.Solutions[self.SequentalCount[0]+1][self.SequentalCount[1]][self.SequentalCount[2]+1]) != -1:
+			values[5] = (self.Solutions[self.SequentalCount[0]+1][self.SequentalCount[1]][self.SequentalCount[2]+1])
+		else:
+			values[5] = self.Function(points[0])
+			(self.Solutions[self.SequentalCount[0]+1][self.SequentalCount[1]][self.SequentalCount[2]+1]) = values[5]
+		#point 6
+		if (self.Solutions[self.SequentalCount[0]+1][self.SequentalCount[1]+1][self.SequentalCount[2]+1]) != -1:
+			values[6] = (self.Solutions[self.SequentalCount[0]+1][self.SequentalCount[1]+1][self.SequentalCount[2]+1])
+		else:
+			values[6] = self.Function(points[0])
+			(self.Solutions[self.SequentalCount[0]+1][self.SequentalCount[1]+1][self.SequentalCount[2]+1]) = values[6]
+		#point 7
+		if (self.Solutions[self.SequentalCount[0]][self.SequentalCount[1]+1][self.SequentalCount[2]+1]) != -1:
+			values[7] = (self.Solutions[self.SequentalCount[0]][self.SequentalCount[1]+1][self.SequentalCount[2]+1])
+		else:
+			values[7] = self.Function(points[0])
+			(self.Solutions[self.SequentalCount[0]][self.SequentalCount[1]+1][self.SequentalCount[2]+1]) = values[7]
 	
+
+
+
+
+		#sequental count is incrimented by x, y, z
+		if(self.SequentalCount[0] >= (self.Size[0]-1)):
+			self.SequentalCount[0] = 0
+			if(self.SequentalCount[1] >= (self.Size[1]-1)):
+				self.SequentalCount[1] = 0
+				if(self.SequentalCount[2] >= (self.Size[2]-1)):
+					return None
+				else:
+					self.SequentalCount[2] = self.SequentalCount[2] + 1
+			else:
+				self.SequentalCount[1] = self.SequentalCount[1] + 1
+		else: 
+			self.SequentalCount[0] = self.SequentalCount[0] + 1
+
+		return (points, values)
+
+	def resetSequentialCount(self):
+		self.SequentalCount = [0,0,0]
+
+	def dfsCube(self):
+		pass
+
 class Facet:
 
 	V1 = []
@@ -55,7 +180,7 @@ class Facet:
 
 
 
-def MarchingCubes(polyCube):
+def MarchingCubes(points, values):
 
 	vert_list = [0]*12
 
@@ -352,21 +477,21 @@ def MarchingCubes(polyCube):
 	#check cube to generate cube index
 	#list of indexes that are inside the surface
 	cube_index = 0
-	if(polyCube.values[0] == 0):
+	if(values[0] == 0):
 		cube_index += 1
-	if(polyCube.values[1] == 0):
+	if(values[1] == 0):
 		cube_index += 2
-	if(polyCube.values[2] == 0):
+	if(values[2] == 0):
 		cube_index += 4
-	if(polyCube.values[3] == 0):
+	if(values[3] == 0):
 		cube_index += 8
-	if(polyCube.values[4] == 0):
+	if(values[4] == 0):
 		cube_index += 16
-	if(polyCube.values[5] == 0):
+	if(values[5] == 0):
 		cube_index += 32
-	if(polyCube.values[6] == 0):
+	if(values[6] == 0):
 		cube_index += 64
-	if(polyCube.values[7] == 0):
+	if(values[7] == 0):
 		cube_index += 128
 
 	#check if cube actually intersects with surface mesh
@@ -375,41 +500,41 @@ def MarchingCubes(polyCube):
 
 	#find vertices for which surface intersects cube
 	if(edgeTable[cube_index] & 1):
-		vert_list[0] = PointInterp(polyCube.points[0], polyCube.points[1])
+		vert_list[0] = PointInterp(points[0], points[1])
 		
 
 	if(edgeTable[cube_index] & 2):
-		vert_list[1] = PointInterp(polyCube.points[1], polyCube.points[2]) 
+		vert_list[1] = PointInterp(points[1], points[2]) 
 
 	if(edgeTable[cube_index] & 4):
-		vert_list[2] = PointInterp(polyCube.points[2], polyCube.points[3])
+		vert_list[2] = PointInterp(points[2], points[3])
 
 	if(edgeTable[cube_index] & 8):
-		vert_list[3] = PointInterp(polyCube.points[3], polyCube.points[0])
+		vert_list[3] = PointInterp(points[3], points[0])
 
 	if(edgeTable[cube_index] & 16):
-		vert_list[4] = PointInterp(polyCube.points[4], polyCube.points[5])
+		vert_list[4] = PointInterp(points[4], points[5])
 
 	if(edgeTable[cube_index] & 32):
-		vert_list[5] = PointInterp(polyCube.points[5], polyCube.points[6])
+		vert_list[5] = PointInterp(points[5], points[6])
 
 	if(edgeTable[cube_index] & 64):
-		vert_list[6] = PointInterp(polyCube.points[6], polyCube.points[7])
+		vert_list[6] = PointInterp(points[6], points[7])
 
 	if(edgeTable[cube_index] & 128):
-		vert_list[7] = PointInterp(polyCube.points[7], polyCube.points[4])
+		vert_list[7] = PointInterp(points[7], points[4])
 
 	if(edgeTable[cube_index] & 256):
-		vert_list[8] = PointInterp(polyCube.points[0], polyCube.points[4])
+		vert_list[8] = PointInterp(points[0], points[4])
 
 	if(edgeTable[cube_index] & 512):
-		vert_list[9] = PointInterp(polyCube.points[1], polyCube.points[5])
+		vert_list[9] = PointInterp(points[1], points[5])
 
 	if(edgeTable[cube_index] & 1024):
-		vert_list[10] = PointInterp(polyCube.points[2], polyCube.points[6])
+		vert_list[10] = PointInterp(points[2], points[6])
 
 	if(edgeTable[cube_index] & 2048):
-		vert_list[11] = PointInterp(polyCube.points[3], polyCube.points[7])
+		vert_list[11] = PointInterp(points[3], points[7])
 
 	# create triangles
 	i = 0
@@ -431,5 +556,29 @@ def PointInterp(p1, p2):
 	y = round((p1[1]+p2[1])/2.0, 8)
 	z = round((p1[2]+p2[2])/2.0, 8)
 	return[x,y,z]
+
+
+if __name__ == '__main__':
+	start_time = time.time()
+	mySTL = stl.SimpleSTL('test1')
+	generator = CubeGrid(fn.sine_grid, [200,200,200], [0,0,0], 0.05)
+
+	nextCube = generator.SpawnSequentialCube()
+
+	while nextCube is not None:
+		#print nextCube
+		newMeshes = MarchingCubes(nextCube[0], nextCube[1])
+		
+		nextCube = generator.SpawnSequentialCube()
+		if(newMeshes is not None):
+			#print "yay"
+			for new in newMeshes:
+				mySTL.addFacet(new)
+	mySTL.ExportBinSTL()
+	#print generator.Solutions
+	print("--- %s seconds ---" % (time.time() - start_time))
+
+
+
 
 
