@@ -13,19 +13,9 @@ def MeshSection(arg):
 
 	meshes = []
 	generator = mc.CubeGrid(function,[xmax-xmin,ymax-ymin,zmax-zmin], [xmin, ymin, zmin], step_size)
-
-	nextCube = generator.SpawnSequentialCube()
-
-	while nextCube is not None:
-		newMeshes = mc.MarchingCubes(nextCube[0], nextCube[1])
-		
-		nextCube = generator.SpawnSequentialCube()
-		if(newMeshes is not None):
-			
-			for new in newMeshes:
-				meshes.append(new)
-				
-	return meshes
+	generator.SearchCube(True)
+	
+	return generator.triangles
 
 
 
@@ -39,16 +29,15 @@ def FunctionToSTL(function, stepSize, Min, Max, fileName):
 		args.append((function, n*slice_size, (n+1)*slice_size, Min, Max, Min, Max, stepSize))
 
 	results = (p.map(MeshSection, args))
+
 	for subResult in results:
 		for triangleMesh in subResult:
 			mySTL.addFacet(triangleMesh)
-
-	#mySTL.ExportBinSTL()
 	mySTL.ExportBinSTL()
 
 
 
 if __name__ == '__main__':
 	start_time = time.time()
-	FunctionToSTL(fn.sine_grid, 0.05, 0, 200, "test2")
+	FunctionToSTL(fn.sine_grid, 0.025, 0, 400, "test2")
 	print("--- %s seconds ---" % (time.time() - start_time))
