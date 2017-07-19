@@ -79,6 +79,8 @@ def bounds(point):
 		return 0
 	else: 
 		return 1
+def returnZero(point):
+	return 0
 
 def TestFunction1(point):
 	[x,y,z] = point
