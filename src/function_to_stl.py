@@ -39,9 +39,5 @@ def FunctionToSTL(function, stepSize, Min, Max, fileName):
 
 if __name__ == '__main__':
 	start_time = time.time()
-<<<<<<< HEAD
 	FunctionToSTL(fn.sine_grid, 0.1, 0, 50, "test2")
-=======
-	FunctionToSTL(fn.sine_grid, 0.025, 0, 400, "test2")
->>>>>>> af1ff5f74b721f705c92a32d6e20538d7f9be66d
 	print("--- %s seconds ---" % (time.time() - start_time))

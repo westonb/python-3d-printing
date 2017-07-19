@@ -985,31 +985,6 @@ def PointInterp(p1, p2):
 	return[x,y,z]
 
 
-<<<<<<< HEAD
-=======
-if __name__ == '__main__':
-	start_time = time.time()
-	mySTL = stl.SimpleSTL('test1')
-	generator = CubeGrid(fn.sine_grid, [400,400,400], [0,0,0], 0.05)
-
-	generator.SearchCube(True)
-	for mesh in generator.triangles:
-		mySTL.addFacet(mesh)
-
-	# while nextCube is not None:
-	# 	newMeshes = MarchingCubes(nextCube[0], nextCube[1])
-		
-	# 	nextCube = generator.SpawnSequentialCube()
-	# 	if(newMeshes is not None):
-	# 		for new in newMeshes:
-	# 			mySTL.addFacet(new)
-
-
-	mySTL.ExportBinSTL()
-	print("--- %s seconds ---" % (time.time() - start_time))
-
->>>>>>> af1ff5f74b721f705c92a32d6e20538d7f9be66d
-
 
 
 
